@@ -1,0 +1,121 @@
+package controller;
+
+import model.Livre;
+import model.LivreModel;
+import view.LivreView;
+
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class LivreController {
+    private LivreModel livreModel;
+    private LivreView livreView;
+
+    public LivreController(LivreModel model, LivreView view) {
+        this.livreModel = model;
+        this.livreView = view;
+
+        // Ajouter des écouteurs d'événements
+        livreView.addAddButtonListener(e -> ajouterLivre());
+        livreView.addDeleteButtonListener(e -> supprimerLivre());
+        livreView.addEditButtonListener(e -> modifierLivre());
+        livreView.addListButtonListener(e -> afficherTousLesLivres());
+        livreView.addSearchButtonListener(e -> rechercherLivres());
+    }
+
+    private void ajouterLivre() {
+        try {
+            String titre = livreView.getTitre().trim();
+            String auteur = livreView.getAuteur().trim();
+            int annee = livreView.getAnnee();
+            String genre = livreView.getGenre().trim();
+            double prix = livreView.getPrix();
+            boolean disponible = livreView.isDisponible();
+
+            if (titre.isEmpty() || auteur.isEmpty() || genre.isEmpty()) {
+                throw new IllegalArgumentException("Veuillez remplir tous les champs obligatoires.");
+            }
+
+            Livre livre = new Livre(titre, auteur, annee, genre, disponible, prix);
+            livreModel.AjouterLivre(livre);
+
+            JOptionPane.showMessageDialog(livreView, "Livre ajouté avec succès !");
+            afficherTousLesLivres();
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(livreView, "Erreur : Année ou prix invalide.", "Erreur", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(livreView, "Erreur : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void supprimerLivre() {
+        try {
+            int selectedIndex = livreView.livreList.getSelectedIndex();
+            if (selectedIndex == -1) {
+                JOptionPane.showMessageDialog(livreView, "Veuillez sélectionner un livre à supprimer.", "Erreur", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            Livre livre = livreModel.getLivres().get(selectedIndex);
+            livreModel.SupprimerLivre(livre);
+
+            JOptionPane.showMessageDialog(livreView, "Livre supprimé avec succès !");
+            afficherTousLesLivres();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(livreView, "Erreur : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void modifierLivre() {
+        try {
+            int selectedIndex = livreView.livreList.getSelectedIndex();
+            if (selectedIndex == -1) {
+                JOptionPane.showMessageDialog(livreView, "Veuillez sélectionner un livre à modifier.", "Erreur", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            Livre livre = livreModel.getLivres().get(selectedIndex);
+            String nouveauTitre = livreView.getTitre().trim();
+
+            if (nouveauTitre.isEmpty()) {
+                throw new IllegalArgumentException("Le titre ne peut pas être vide.");
+            }
+
+            livre.setTitre(nouveauTitre); // Modification dans l'objet
+            livreModel.ModifierLivre(livre.getId(), nouveauTitre); // Mise à jour dans le modèle
+
+            JOptionPane.showMessageDialog(livreView, "Livre modifié avec succès !");
+            afficherTousLesLivres();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(livreView, "Erreur : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void afficherTousLesLivres() {
+        List<Livre> livres = livreModel.getLivres();
+        livreView.updateLivreList(convertLivreListToStringList(livres));
+    }
+
+    private void rechercherLivres() {
+        try {
+            String titreRecherche = livreView.getSearchTitre().trim();
+            String genreFiltre = livreView.getFilterGenre().trim();
+            double prixMax = livreView.getFilterPrix();
+
+            List<Livre> resultatsFiltres = livreModel.filtrerLivres(titreRecherche, genreFiltre, prixMax);
+            livreView.updateLivreList(convertLivreListToStringList(resultatsFiltres));
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(livreView, "Erreur : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private List<String> convertLivreListToStringList(List<Livre> livres) {
+        List<String> stringList = new ArrayList<>();
+        for (Livre livre : livres) {
+            stringList.add(String.format("ID: %d - %s by %s (%d) - %.2f €", 
+                livre.getId(), livre.getTitre(), livre.getAuteur(), livre.getAnneePublication(), livre.getPrix()));
+        }
+        return stringList;
+    }
+}

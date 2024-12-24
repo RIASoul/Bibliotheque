@@ -1,0 +1,145 @@
+package controller;
+
+import model.Emprunt;
+import model.EmpruntModel;
+import model.Livre;
+import model.Utilisateur;
+import model.UtilisateurModel;
+import view.EmpruntView;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.List;
+import java.util.ArrayList;
+
+import javax.swing.JOptionPane;
+
+public class EmpruntController {
+
+    private EmpruntView view;
+    private EmpruntModel model;
+
+    public EmpruntController(EmpruntView view, EmpruntModel model) {
+        this.view = view;
+        this.model = model;
+
+        // Ajouter des listeners pour les boutons
+        this.view.addEnregistrerListener(new EnregistrerEmpruntListener());
+        this.view.addAfficherListener(new AfficherEmpruntListener());
+        this.view.addProlongerListener(new ProlongerEmpruntListener());
+    }
+
+    // Listener pour le bouton "Enregistrer Emprunt"
+    private class EnregistrerEmpruntListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                int utilisateurId = view.getSelectedUtilisateurId();
+                List<Integer> livresIds = view.getSelectedLivresIds();
+                String dateEmpruntStr = view.getDateEmprunt();
+                String dateRetourStr = view.getDateRetour();
+
+                if (dateEmpruntStr.isEmpty() || dateRetourStr.isEmpty()) {
+                    JOptionPane.showMessageDialog(view, "Les dates d'emprunt et de retour doivent être renseignées.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                if (!isValidDate(dateEmpruntStr) || !isValidDate(dateRetourStr)) {
+                    JOptionPane.showMessageDialog(view, "Les dates doivent être au format AAAA-MM-JJ.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                LocalDate dateEmprunt = LocalDate.parse(dateEmpruntStr);
+                LocalDate dateRetour = LocalDate.parse(dateRetourStr);
+
+                Utilisateur utilisateur = model.getUtilisateurModel().getUtilisateurById(utilisateurId);
+                if (utilisateur == null) {
+                    JOptionPane.showMessageDialog(view, "Utilisateur introuvable.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                List<Livre> livres = model.getLivreModel().getLivresByIds(livresIds);
+                if (livres == null || livres.isEmpty()) {
+                    JOptionPane.showMessageDialog(view, "Aucun livre sélectionné ou introuvable.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                Emprunt emprunt = new Emprunt(utilisateur, livres, dateEmprunt, dateRetour);
+                model.enregistrerEmprunt(emprunt);
+
+                JOptionPane.showMessageDialog(view, "Emprunt enregistré avec succès.", "Succès", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(view, "Erreur : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
+            }
+        }
+
+        private boolean isValidDate(String dateStr) {
+            try {
+                LocalDate.parse(dateStr);
+                return true;
+            } catch (DateTimeParseException e) {
+                return false;
+            }
+        }
+    }
+
+    // Listener pour le bouton "Afficher Emprunts"
+    private class AfficherEmpruntListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            view.clearTable();
+
+            for (Emprunt emprunt : model.getEmprunts()) {
+                String utilisateurId = String.valueOf(emprunt.getUtilisateur().getId());
+                String livreIds = getLivresIdsAsString(emprunt.getLivres());
+                String dateEmprunt = emprunt.getDateEmprunt().toString();
+                String dateRetour = emprunt.getDateRetourPrevue().toString();
+
+                view.ajouterEmprunt(utilisateurId, livreIds, dateEmprunt, dateRetour);
+            }
+        }
+
+        private String getLivresIdsAsString(List<Livre> livres) {
+            StringBuilder livreIds = new StringBuilder();
+            for (Livre livre : livres) {
+                if (livreIds.length() > 0) {
+                    livreIds.append(", ");
+                }
+                livreIds.append(livre.getId());
+            }
+            return livreIds.toString();
+        }
+    }
+
+    // Listener pour le bouton "Prolonger Emprunt"
+    private class ProlongerEmpruntListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                int empruntId = view.getSelectedEmpruntId();
+                String nouvelleDateRetourStr = JOptionPane.showInputDialog(view, "Entrez la nouvelle date de retour (AAAA-MM-JJ) :");
+
+                if (nouvelleDateRetourStr == null || nouvelleDateRetourStr.trim().isEmpty()) {
+                    JOptionPane.showMessageDialog(view, "La date de retour ne peut pas être vide.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                LocalDate nouvelleDateRetour = LocalDate.parse(nouvelleDateRetourStr);
+                if (nouvelleDateRetour.isAfter(LocalDate.now())) {
+                    model.prolongerEmprunt(empruntId, nouvelleDateRetour);
+                    JOptionPane.showMessageDialog(view, "Emprunt prolongé avec succès.", "Succès", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(view, "La nouvelle date doit être ultérieure à aujourd'hui.", "Erreur", JOptionPane.WARNING_MESSAGE);
+                }
+            } catch (DateTimeParseException ex) {
+                JOptionPane.showMessageDialog(view, "Format de date invalide.", "Erreur", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(view, "Erreur lors de la prolongation : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
+            }
+        }
+    }
+}

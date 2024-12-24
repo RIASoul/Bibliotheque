@@ -1,0 +1,113 @@
+package view;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionListener;
+
+public class EmpruntView extends JPanel {
+
+    private JTextField utilisateurIdField;
+    private JTextField livresIdsField;
+    private JTextField dateEmpruntField;
+    private JTextField dateRetourField;
+    private JButton enregistrerButton;
+    private JButton afficherButton;
+
+    public EmpruntView() {
+        // Initialisation des composants de la vue
+        utilisateurIdField = new JTextField(20);
+        livresIdsField = new JTextField(20);
+        dateEmpruntField = new JTextField(20);
+        dateRetourField = new JTextField(20);
+        enregistrerButton = new JButton("Enregistrer Emprunt");
+        afficherButton = new JButton("Afficher Emprunts");
+
+        // Mise en page avec GridBagLayout pour une disposition plus soignée
+        setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10); // Espacement des composants
+
+        // Ajout du champ ID Utilisateur
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        add(new JLabel("ID Utilisateur : "), gbc);
+
+        gbc.gridx = 1;
+        add(utilisateurIdField, gbc);
+
+        // Ajout du champ pour les IDs des livres
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        add(new JLabel("IDs des Livres (séparés par des virgules) : "), gbc);
+
+        gbc.gridx = 1;
+        add(livresIdsField, gbc);
+
+        // Ajout du champ Date Emprunt
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        add(new JLabel("Date Emprunt : "), gbc);
+
+        gbc.gridx = 1;
+        add(dateEmpruntField, gbc);
+
+        // Ajout du champ Date Retour
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        add(new JLabel("Date Retour : "), gbc);
+
+        gbc.gridx = 1;
+        add(dateRetourField, gbc);
+
+        // Ajout des boutons
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.gridwidth = 2; // Les boutons prennent toute la largeur
+        gbc.anchor = GridBagConstraints.CENTER;
+
+        JPanel buttonPanel = new JPanel(new FlowLayout());
+        buttonPanel.add(enregistrerButton);
+        buttonPanel.add(afficherButton);
+
+        add(buttonPanel, gbc);
+
+        setPreferredSize(new Dimension(400, 300)); // Taille préférée du JPanel
+    }
+
+    // Méthode pour récupérer l'ID de l'utilisateur
+    public String getUtilisateurId() {
+        return utilisateurIdField.getText();
+    }
+
+    // Méthode pour récupérer les IDs des livres sous forme de chaîne de caractères
+    public String getLivresIds() {
+        return livresIdsField.getText();
+    }
+
+    // Méthode pour récupérer la date d'emprunt
+    public String getDateEmprunt() {
+        return dateEmpruntField.getText();
+    }
+
+    // Méthode pour récupérer la date de retour prévue
+    public String getDateRetour() {
+        return dateRetourField.getText();
+    }
+
+    // Méthode pour ajouter le listener au bouton "Enregistrer Emprunt"
+    public void addEnregistrerListener(ActionListener listener) {
+        enregistrerButton.addActionListener(listener);
+    }
+
+    // Méthode pour ajouter le listener au bouton "Afficher Emprunts"
+    public void addAfficherListener(ActionListener listener) {
+        afficherButton.addActionListener(listener);
+    }
+
+    // Méthode pour afficher un emprunt dans la vue (table)
+    public void ajouterEmprunt(String utilisateurId, String livreIds, String dateEmprunt, String dateRetour) {
+        // Ajouter l'emprunt à un tableau ou un autre composant de la vue
+        System.out.println("Emprunt ajouté : " + utilisateurId + ", " + livreIds + ", " + dateEmprunt + ", " + dateRetour);
+    }
+}

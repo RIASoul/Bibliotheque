@@ -1,0 +1,16 @@
+package model;
+
+import exception.CSVOperationException;
+import exception.LivreNotFoundException;
+
+public interface LivreModelInterface {
+
+	public void AjouterLivre(Livre livre);
+	public void SupprimerLivre(Livre livre) throws LivreNotFoundException;
+	public void ModifierLivre(int idLivre, String nouvTitre) throws LivreNotFoundException;
+	public void AfficherLivre();
+	public Boolean RechercherLivre(String motCle);
+	public void chargerLivresDepuisCSV() throws CSVOperationException;
+	public void sauvegarderLivresDansCSV() throws CSVOperationException;
+	
+}

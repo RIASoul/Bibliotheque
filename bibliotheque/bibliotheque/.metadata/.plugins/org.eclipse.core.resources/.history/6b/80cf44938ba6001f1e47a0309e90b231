@@ -1,0 +1,60 @@
+package model;
+
+public class Emprunt {
+
+	private Utilisateur user, emprunteur;
+	private String dateEmprunt, dateRetour;
+	
+	
+	public Emprunt(Utilisateur user, Utilisateur emprunteur, String dateEmprunt, String dateRetour) {
+		super();
+		this.user = user;
+		this.emprunteur = emprunteur;
+		this.dateEmprunt = dateEmprunt;
+		this.dateRetour = dateRetour;
+	}
+
+
+	public Utilisateur getUser() {
+		return user;
+	}
+
+
+	public void setUser(Utilisateur user) {
+		this.user = user;
+	}
+
+
+	public Utilisateur getEmprunteur() {
+		return emprunteur;
+	}
+
+
+	public void setEmprunteur(Utilisateur emprunteur) {
+		this.emprunteur = emprunteur;
+	}
+
+
+	public String getDateEmprunt() {
+		return dateEmprunt;
+	}
+
+
+	public void setDateEmprunt(String dateEmprunt) {
+		this.dateEmprunt = dateEmprunt;
+	}
+
+
+	public String getDateRetour() {
+		return dateRetour;
+	}
+
+
+	public void setDateRetour(String dateRetour) {
+		this.dateRetour = dateRetour;
+	}
+	
+	
+	
+	
+}

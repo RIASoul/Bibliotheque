@@ -1,0 +1,39 @@
+package view;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class MenuView extends JFrame {
+    private JTabbedPane tabbedPane; // Onglets principaux
+    private JPanel livrePanel;
+    private JPanel empruntPanel;
+    private JPanel utilisateurPanel;
+    private JPanel retourPanel;
+
+    public MenuView() {
+        setTitle("Menu Principal");
+        setSize(800, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        initializeUI();
+    }
+
+    private void initializeUI() {
+        tabbedPane = new JTabbedPane();
+
+        // Initialisation des panneaux
+        livrePanel = new LivreView(); // Utilisation de LivreView comme JPanel
+        empruntPanel = new EmpruntView(); // Utilisation de EmpruntView comme JPanel
+        utilisateurPanel = new UtilisateurView(); // Utilisation de UtilisateurView comme JPanel
+        //retourPanel = new RetourView();
+
+        // Ajout des panneaux aux onglets
+        tabbedPane.addTab("Gestion des Livres", livrePanel);
+        tabbedPane.addTab("Gestion des Emprunts", empruntPanel);
+        tabbedPane.addTab("Gestion des Utilisateurs", utilisateurPanel);
+
+        // Ajouter le JTabbedPane au contenu principal de la fenêtre
+        add(tabbedPane);
+    }
+
+    
+}

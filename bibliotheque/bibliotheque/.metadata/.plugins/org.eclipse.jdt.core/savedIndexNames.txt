@@ -1,0 +1,4 @@
+INDEX VERSION 1.134+C:\Users\lenovo\Documents\4iir\Java\bibliotheque\.metadata\.plugins\org.eclipse.jdt.core
+2701253930.index
+1865797976.index
+1887265757.index

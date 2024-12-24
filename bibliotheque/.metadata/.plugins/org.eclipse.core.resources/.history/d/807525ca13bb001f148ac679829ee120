@@ -1,0 +1,132 @@
+package view;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionListener;
+import javax.swing.table.DefaultTableModel;
+
+public class UtilisateurView extends JPanel {
+
+    private JTextField nomField;
+    private JTextField prenomField;
+    private JTextField emailField;
+    private JTextField roleField;
+    private JButton addButton;
+    private JButton deleteButton;
+    private JButton editButton;
+    private JButton listButton;
+
+    private JTable userTable;
+    private DefaultTableModel tableModel;
+
+    public UtilisateurView() {
+        //setTitle("Gestion des Utilisateurs");
+        setSize(700, 500);
+        //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        initializeUI();
+    }
+
+    private void initializeUI() {
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout(10, 10));
+
+        // Inputs Panel
+        JPanel inputPanel = new JPanel(new GridLayout(4, 2, 5, 5));
+        inputPanel.add(new JLabel("Nom:"));
+        nomField = new JTextField();
+        inputPanel.add(nomField);
+
+        inputPanel.add(new JLabel("Prénom:"));
+        prenomField = new JTextField();
+        inputPanel.add(prenomField);
+
+        inputPanel.add(new JLabel("Email:"));
+        emailField = new JTextField();
+        inputPanel.add(emailField);
+
+        inputPanel.add(new JLabel("Role:"));
+        roleField = new JTextField();
+        inputPanel.add(roleField);
+
+        // Buttons Panel
+        addButton = new JButton("Ajouter Utilisateur");
+        deleteButton = new JButton("Supprimer Utilisateur");
+        editButton = new JButton("Modifier Utilisateur");
+        listButton = new JButton("Afficher Utilisateurs");
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        buttonPanel.add(addButton);
+        buttonPanel.add(deleteButton);
+        buttonPanel.add(editButton);
+        buttonPanel.add(listButton);
+
+        // Table Panel
+        tableModel = new DefaultTableModel(new String[]{"ID", "Nom", "Prénom", "Email", "Role"}, 0);
+        userTable = new JTable(tableModel);
+        JScrollPane tableScrollPane = new JScrollPane(userTable);
+
+        // Add panels to main panel
+        mainPanel.add(inputPanel, BorderLayout.NORTH);
+        mainPanel.add(tableScrollPane, BorderLayout.CENTER);
+        mainPanel.add(buttonPanel, BorderLayout.CENTER);
+
+        add(mainPanel);
+    }
+
+    // Getter methods
+    public String getNom() {
+        return nomField.getText();
+    }
+
+    public String getPrenom() {
+        return prenomField.getText();
+    }
+
+    public String getEmail() {
+        return emailField.getText();
+    }
+
+    public String getRole() {
+        return roleField.getText();
+    }
+
+    public JTable getUserTable() {
+        return userTable;
+    }
+
+    public void clearInputFields() {
+        nomField.setText("");
+        prenomField.setText("");
+        emailField.setText("");
+        roleField.setText("");
+    }
+
+    public void addUserToTable(Object[] rowData) {
+        tableModel.addRow(rowData);
+    }
+
+    public void clearTable() {
+        tableModel.setRowCount(0);
+    }
+
+    public void showMessage(String message) {
+        JOptionPane.showMessageDialog(this, message);
+    }
+
+    // Listener methods
+    public void addAddButtonListener(ActionListener listener) {
+        addButton.addActionListener(listener);
+    }
+
+    public void addDeleteButtonListener(ActionListener listener) {
+        deleteButton.addActionListener(listener);
+    }
+
+    public void addEditButtonListener(ActionListener listener) {
+        editButton.addActionListener(listener);
+    }
+
+    public void addListButtonListener(ActionListener listener) {
+        listButton.addActionListener(listener);
+    }
+}

@@ -1,0 +1,157 @@
+package controller;
+
+import model.Emprunt;
+
+import model.EmpruntModel;
+import model.Livre;
+import model.Utilisateur;
+import view.EmpruntView;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.ArrayList;
+
+import javax.swing.JOptionPane;
+
+public class EmpruntController {
+
+    private EmpruntView view;
+    private EmpruntModel model;
+
+    public EmpruntController(EmpruntView view, EmpruntModel model) {
+        this.view = view;
+        this.model = model;
+
+        // Ajouter des listeners pour les boutons
+        this.view.addEnregistrerListener(new EnregistrerEmpruntListener());
+        this.view.addAfficherListener(new AfficherEmpruntListener());
+    }
+
+
+    // Listener pour le bouton "Enregistrer Emprunt"
+    private class EnregistrerEmpruntListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String utilisateurIdStr = view.getUtilisateurId();
+            String livresIdsStr = view.getLivresIds(); // Plusieurs livres séparés par des virgules
+            String dateEmpruntStr = view.getDateEmprunt();
+            String dateRetourStr = view.getDateRetour();
+
+            if (utilisateurIdStr.isEmpty() || livresIdsStr.isEmpty() || dateEmpruntStr.isEmpty() || dateRetourStr.isEmpty()) {
+                JOptionPane.showMessageDialog(view, "Tous les champs doivent être remplis.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            try {
+                // Affichage des entrées pour débogage
+                System.out.println("Utilisateur ID: " + utilisateurIdStr);
+                System.out.println("Livres IDs: " + livresIdsStr);
+                System.out.println("Date Emprunt: " + dateEmpruntStr);
+                System.out.println("Date Retour: " + dateRetourStr);
+
+                // Convertir les entrées en types appropriés
+                int utilisateurId = Integer.parseInt(utilisateurIdStr);
+                List<Integer> livresIds = parseLivresIds(livresIdsStr); // Parse les IDs de livres
+                LocalDate dateEmprunt = LocalDate.parse(dateEmpruntStr);
+                LocalDate dateRetour = LocalDate.parse(dateRetourStr);
+
+                // Récupérer l'utilisateur et les livres
+                Utilisateur utilisateur = model.getUtilisateurModel().getUtilisateurById(utilisateurId);
+                List<Livre> livres = model.getLivreModel().getLivresByIds(livresIds); // Utilisation de la méthode adaptée
+
+                if (utilisateur != null && livres != null && !livres.isEmpty()) {
+                    // Créer l'emprunt avec plusieurs livres
+                    Emprunt emprunt = new Emprunt(utilisateur, livres, dateEmprunt, dateRetour);
+
+                    // Enregistrer l'emprunt
+                    model.enregistrerEmprunt(emprunt);
+                    JOptionPane.showMessageDialog(view, "Emprunt enregistré avec succès.", "Succès", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(view, "Utilisateur ou Livres introuvables.");
+                }
+
+            } catch (Exception ex) {
+                // Affichage de l'exception exacte pour le débogage
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(view, "Erreur dans les données saisies: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+        // Méthode pour parser les IDs des livres
+        private List<Integer> parseLivresIds(String livresIdsStr) {
+            String[] livreIdsArray = livresIdsStr.split(",");
+            List<Integer> livresIds = new ArrayList<>();
+            for (String livreIdStr : livreIdsArray) {
+                try {
+                    livresIds.add(Integer.parseInt(livreIdStr.trim()));
+                } catch (NumberFormatException e) {
+                    // Ignore les erreurs de formatage
+                }
+            }
+            return livresIds;
+        }
+    }
+
+    // Listener pour le bouton "Afficher Emprunts"
+    private class AfficherEmpruntListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // Vider la table actuelle
+            //view.getTableModel().setRowCount(0);
+
+            // Ajouter tous les emprunts au modèle de la vue
+            for (Emprunt emprunt : model.getEmprunts()) {
+                String utilisateurId = String.valueOf(emprunt.getUtilisateur().getId());
+                String livreIds = getLivresIdsAsString(emprunt.getLivres());
+                String dateEmprunt = emprunt.getDateEmprunt().toString();
+                String dateRetour = emprunt.getDateRetourPrevue().toString();
+
+                // Ajouter à la table de la vue
+                view.ajouterEmprunt(utilisateurId, livreIds, dateEmprunt, dateRetour);
+            }
+        }
+
+        // Méthode pour obtenir les IDs des livres en tant que chaîne de caractères
+        private String getLivresIdsAsString(List<Livre> livres) {
+            StringBuilder livreIds = new StringBuilder();
+            for (Livre livre : livres) {
+                if (livreIds.length() > 0) {
+                    livreIds.append(", ");
+                }
+                livreIds.append(livre.getId());
+            }
+            return livreIds.toString();
+        }
+        
+        
+        
+        
+        
+        private void consulterHistorique() {
+            try {
+                int utilisateurId = Integer.parseInt(view.getUtilisateurId());
+                // Logic to consult history for the user
+                model.consulterHistoriqueParUtilisateur(utilisateurId);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        // Method to handle the "Prolonger Emprunt" button click
+        private void prolongerEmprunt() {
+            try {
+                int empruntId = Integer.parseInt(view.getUtilisateurId());  // Assuming empruntId is provided
+                String dateRetour = view.getDateRetour();
+                // Logic to prolong the borrow
+                model.prolongerEmprunt(empruntId, LocalDate.parse(dateRetour));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        
+        
+        
+        
+        }}
+}

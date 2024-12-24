@@ -1,0 +1,106 @@
+package controller;
+
+import model.Livre;
+import model.LivreModel;
+import view.LivreView;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
+
+public class LivreController {
+    private LivreModel livreModel;
+    private LivreView livreView;
+
+    public LivreController(LivreModel model, LivreView view) {
+        this.livreModel = model;
+        this.livreView = view;
+
+        // Ajouter des écouteurs d'événements pour les boutons avec des expressions lambda
+        livreView.addAddButtonListener(e -> {
+            try {
+                String titre = livreView.getTitre();
+                String auteur = livreView.getAuteur();
+                int annee = livreView.getAnnee();
+                String genre = livreView.getGenre();
+                double prix = livreView.getPrix();
+                boolean disponible = livreView.isDisponible();
+
+                Livre livre = new Livre(titre, auteur, annee, genre, disponible, prix);
+                livreModel.AjouterLivre(livre);
+
+                JOptionPane.showMessageDialog(livreView, "Livre ajouté avec succès!");
+                livreView.updateLivreList(convertLivreListToStringList(livreModel.getLivres()));
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(livreView, "Erreur lors de l'ajout du livre: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        livreView.addDeleteButtonListener(e -> {
+            try {
+                int selectedIndex = livreView.livreList.getSelectedIndex();
+                if (selectedIndex != -1) {
+                    Livre livre = livreModel.getLivres().get(selectedIndex);
+                    livreModel.SupprimerLivre(livre);
+
+                    JOptionPane.showMessageDialog(livreView, "Livre supprimé avec succès!");
+                    livreView.updateLivreList(convertLivreListToStringList(livreModel.getLivres()));
+                } else {
+                    JOptionPane.showMessageDialog(livreView, "Veuillez sélectionner un livre à supprimer", "Erreur", JOptionPane.WARNING_MESSAGE);
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(livreView, "Erreur lors de la suppression du livre: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        livreView.addEditButtonListener(e -> {
+            try {
+                int selectedIndex = livreView.livreList.getSelectedIndex();
+                if (selectedIndex != -1) {
+                    Livre livre = livreModel.getLivres().get(selectedIndex);
+                    int idLivre = livre.getId(); // Récupérer l'ID du livre
+                    String nouveauTitre = livreView.getTitre();
+
+                    livreModel.ModifierLivre(idLivre, nouveauTitre); // Appeler la méthode avec les bons arguments
+
+                    JOptionPane.showMessageDialog(livreView, "Livre modifié avec succès!");
+                    livreView.updateLivreList(convertLivreListToStringList(livreModel.getLivres()));
+                } else {
+                    JOptionPane.showMessageDialog(livreView, "Veuillez sélectionner un livre à modifier", "Erreur", JOptionPane.WARNING_MESSAGE);
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(livreView, "Erreur lors de la modification du livre: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        livreView.addListButtonListener(e -> livreView.updateLivreList(convertLivreListToStringList(livreModel.getLivres())));
+    }
+    
+    
+    
+    
+    livreView.addSearchButtonListener(e -> {
+        String titreRecherche = livreView.getSearchTitre();
+        String genreFiltre = livreView.getFilterGenre();
+        double prixMax = livreView.getFilterPrix();
+
+        List<Livre> resultatsFiltrés = livreModel.filtrerLivres(titreRecherche, genreFiltre, prixMax);
+        livreView.updateLivreList(convertLivreListToStringList(resultatsFiltrés));
+    });
+
+    
+    
+    
+    
+
+    private List<String> convertLivreListToStringList(List<Livre> livres) {
+        List<String> stringList = new ArrayList<>();
+        for (Livre livre : livres) {
+            stringList.add(String.format("ID: %d - %s by %s (%d)", 
+                livre.getId(), livre.getTitre(), livre.getAuteur(), livre.getAnneePublication()));
+        }
+        return stringList;
+    }
+}

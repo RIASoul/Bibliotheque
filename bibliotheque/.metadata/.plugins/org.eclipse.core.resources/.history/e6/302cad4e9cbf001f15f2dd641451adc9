@@ -1,0 +1,91 @@
+package view;
+
+import javax.swing.*;
+import java.awt.event.ActionListener;
+
+public class EmpruntView extends JPanel {
+
+    private JTextField utilisateurIdField;
+    private JTextField livresIdsField; // Champ pour les IDs des livres
+    private JTextField dateEmpruntField;
+    private JTextField dateRetourField;
+    private JButton enregistrerButton;
+    private JButton afficherButton;
+    private JButton consulterHistoriqueButton; // Nouveau bouton pour consulter l'historique
+    private JButton prolongerButton; // Nouveau bouton pour prolonger un emprunt
+
+    public EmpruntView() {
+        // Initialisation des composants de la vue
+        utilisateurIdField = new JTextField(20);
+        livresIdsField = new JTextField(20); // Nouveau champ pour les IDs des livres
+        dateEmpruntField = new JTextField(20);
+        dateRetourField = new JTextField(20);
+        enregistrerButton = new JButton("Enregistrer Emprunt");
+        afficherButton = new JButton("Afficher Emprunts");
+        consulterHistoriqueButton = new JButton("Consulter Historique"); // Initialisation du bouton
+        prolongerButton = new JButton("Prolonger Emprunt"); // Initialisation du bouton
+
+        // Ajout des composants à la fenêtre
+        add(new JLabel("ID Utilisateur"));
+        add(utilisateurIdField);
+        add(new JLabel("IDs des Livres (séparés par des virgules)"));
+        add(livresIdsField); // Ajout du champ livresIds
+        add(new JLabel("Date Emprunt"));
+        add(dateEmpruntField);
+        add(new JLabel("Date Retour"));
+        add(dateRetourField);
+        add(enregistrerButton);
+        add(afficherButton);
+        add(consulterHistoriqueButton); // Ajout du bouton consulter historique
+        add(prolongerButton); // Ajout du bouton prolonger
+
+        setSize(300, 500); // Augmenté la taille pour accueillir les nouveaux boutons
+        setVisible(true);
+    }
+
+    // Méthode pour récupérer l'ID de l'utilisateur
+    public String getUtilisateurId() {
+        return utilisateurIdField.getText();
+    }
+
+    // Méthode pour récupérer les IDs des livres sous forme de chaîne de caractères
+    public String getLivresIds() {
+        return livresIdsField.getText(); // Retourne la chaîne de textes des IDs des livres
+    }
+
+    // Méthode pour récupérer la date d'emprunt
+    public String getDateEmprunt() {
+        return dateEmpruntField.getText();
+    }
+
+    // Méthode pour récupérer la date de retour prévue
+    public String getDateRetour() {
+        return dateRetourField.getText();
+    }
+
+    // Méthode pour ajouter le listener au bouton "Enregistrer Emprunt"
+    public void addEnregistrerListener(ActionListener listener) {
+        enregistrerButton.addActionListener(listener);
+    }
+
+    // Méthode pour ajouter le listener au bouton "Afficher Emprunts"
+    public void addAfficherListener(ActionListener listener) {
+        afficherButton.addActionListener(listener);
+    }
+
+    // Méthode pour ajouter le listener au bouton "Consulter Historique"
+    public void addConsulterHistoriqueListener(ActionListener listener) {
+        consulterHistoriqueButton.addActionListener(listener);
+    }
+
+    // Méthode pour ajouter le listener au bouton "Prolonger Emprunt"
+    public void addProlongerListener(ActionListener listener) {
+        prolongerButton.addActionListener(listener);
+    }
+
+    // Méthode pour afficher un emprunt dans la vue (table)
+    public void ajouterEmprunt(String utilisateurId, String livreIds, String dateEmprunt, String dateRetour) {
+        // Ajouter l'emprunt à un tableau ou un autre composant de la vue
+        System.out.println("Emprunt ajouté : " + utilisateurId + ", " + livreIds + ", " + dateEmprunt + ", " + dateRetour);
+    }
+}

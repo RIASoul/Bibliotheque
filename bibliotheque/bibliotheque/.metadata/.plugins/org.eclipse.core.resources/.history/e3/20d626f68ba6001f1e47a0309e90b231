@@ -1,0 +1,8 @@
+package model;
+
+public interface EmpruntModelInterface {
+	
+	public void consulterHistorque();
+	public void modifierDateRetour();
+
+}

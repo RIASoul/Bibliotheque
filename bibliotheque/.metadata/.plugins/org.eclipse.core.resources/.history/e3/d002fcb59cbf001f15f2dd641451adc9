@@ -1,0 +1,154 @@
+package controller;
+
+import model.EmpruntModel;
+import model.UtilisateurModel;
+import model.LivreModel;
+import view.EmpruntView;
+import exception.EmpruntNotFoundException;
+import exception.UtilisateurNotFoundException;
+import exception.LivreNotFoundException;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class EmpruntController {
+
+    private EmpruntModel empruntModel;
+    private EmpruntView empruntView;
+
+    public EmpruntController(EmpruntModel empruntModel, EmpruntView empruntView) {
+        this.empruntModel = empruntModel;
+        this.empruntView = empruntView;
+
+        // Mettre à jour les utilisateurs et livres dans la vue
+        mettreAJourUtilisateurs();
+        mettreAJourLivres();
+
+        // Ajouter les listeners aux boutons
+        ajouterListeners();
+    }
+
+    // Méthode pour mettre à jour les utilisateurs dans la vue
+    private void mettreAJourUtilisateurs() {
+        List<String> utilisateurs = empruntModel.getUtilisateurModel().getUtilisateurs().stream()
+                .map(utilisateur -> utilisateur.getId() + " - " + utilisateur.getNom())
+                .collect(Collectors.toList());
+        empruntView.setUtilisateurs(utilisateurs);
+    }
+
+    // Méthode pour mettre à jour les livres dans la vue
+    private void mettreAJourLivres() {
+        List<String> livres = empruntModel.getLivreModel().getLivres().stream()
+                .map(livre -> livre.getId() + " - " + livre.getTitre())
+                .collect(Collectors.toList());
+        empruntView.setLivres(livres);
+    }
+
+    // Méthode pour ajouter les listeners aux boutons de la vue
+    private void ajouterListeners() {
+        empruntView.addEnregistrerListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    enregistrerEmprunt();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        empruntView.addAfficherListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                afficherEmprunts();
+            }
+        });
+
+        empruntView.addConsulterHistoriqueListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                consulterHistorique();
+            }
+        });
+
+        empruntView.addProlongerListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                prolongerEmprunt();
+            }
+        });
+    }
+
+    // Méthode pour enregistrer un emprunt
+    private void enregistrerEmprunt() throws IOException {
+        String utilisateurSelectionne = empruntView.getUtilisateurSelectionne();
+        List<String> livresSelectionnes = empruntView.getLivresSelectionnes();
+        String dateEmprunt = empruntView.getDateEmprunt();
+        String dateRetour = empruntView.getDateRetour();
+
+        if (utilisateurSelectionne != null && !livresSelectionnes.isEmpty()) {
+            // Récupérer l'utilisateur par ID (ou toute autre méthode d'identification)
+            int utilisateurId = Integer.parseInt(utilisateurSelectionne.split(" - ")[0]);
+            List<Livre> livres = livresSelectionnes.stream()
+                    .map(livre -> livreModel.getLivres().stream()
+                            .filter(l -> l.getId() == Integer.parseInt(livre.split(" - ")[0]))
+                            .findFirst()
+                            .orElseThrow(() -> new LivreNotFoundException("Livre non trouvé")))
+                    .collect(Collectors.toList());
+
+            // Créer l'emprunt et l'enregistrer
+            Emprunt emprunt = new Emprunt(utilisateurModel.getUtilisateurById(utilisateurId), livres, 
+                    LocalDate.parse(dateEmprunt), LocalDate.parse(dateRetour));
+            empruntModel.enregistrerEmprunt(emprunt);
+        }
+    }
+
+    // Méthode pour afficher les emprunts
+    private void afficherEmprunts() {
+        empruntModel.afficherEmprunt();
+    }
+
+    // Méthode pour consulter l'historique des emprunts d'un utilisateur
+    private void consulterHistorique() {
+        try {
+            String utilisateurSelectionne = empruntView.getUtilisateurSelectionne();
+            int utilisateurId = Integer.parseInt(utilisateurSelectionne.split(" - ")[0]);
+            List<Emprunt> historique = empruntModel.consulterHistoriqueParUtilisateur(utilisateurId);
+
+            // Afficher l'historique (par exemple dans une boîte de dialogue)
+            StringBuilder historiqueStr = new StringBuilder();
+            for (Emprunt emprunt : historique) {
+                historiqueStr.append(emprunt).append("\n");
+            }
+            JOptionPane.showMessageDialog(null, historiqueStr.toString(), 
+                    "Historique des Emprunts", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (UtilisateurNotFoundException e) {
+            JOptionPane.showMessageDialog(null, "Utilisateur non trouvé!", "Erreur", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    // Méthode pour prolonger un emprunt
+    private void prolongerEmprunt() {
+        try {
+            String utilisateurSelectionne = empruntView.getUtilisateurSelectionne();
+            int utilisateurId = Integer.parseInt(utilisateurSelectionne.split(" - ")[0]);
+            List<Emprunt> empruntsUtilisateur = empruntModel.consulterHistoriqueParUtilisateur(utilisateurId);
+
+            // Choisir un emprunt à prolonger (par exemple, en sélectionnant l'ID)
+            String empruntIdStr = JOptionPane.showInputDialog("Entrez l'ID de l'emprunt à prolonger:");
+            int empruntId = Integer.parseInt(empruntIdStr);
+
+            // Entrer la nouvelle date de retour
+            String dateRetour = JOptionPane.showInputDialog("Entrez la nouvelle date de retour (YYYY-MM-DD):");
+            empruntModel.prolongerEmprunt(empruntId, LocalDate.parse(dateRetour));
+
+        } catch (EmpruntNotFoundException | IOException e) {
+            JOptionPane.showMessageDialog(null, "Emprunt non trouvé!", "Erreur", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+}

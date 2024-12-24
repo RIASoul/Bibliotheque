@@ -1,0 +1,100 @@
+package model;
+
+import exception.UtilisateurNotFoundException;
+import exception.CSVOperationException;
+
+import java.io.*;
+import java.util.ArrayList;
+
+public class UtilisateurModel {
+    private ArrayList<Utilisateur> utilisateurs = new ArrayList<>();
+
+    public ArrayList<Utilisateur> getUtilisateurs() {
+        return utilisateurs;
+    }
+
+    public void ajouterUser(Utilisateur utilisateur) {
+        utilisateurs.add(utilisateur);
+    }
+
+    public void modifierUser(int id, String nom, String prenom, String email, String role) throws UtilisateurNotFoundException {
+        for (Utilisateur u : utilisateurs) {
+            if (u.getId() == id) {
+                // Validation des données utilisateur
+                if (email == null || !email.contains("@")) {
+                    throw new IllegalArgumentException("Format de l'email invalide");
+                }
+                u.setNom(nom);
+                u.setPrenom(prenom);
+                u.setEmail(email);
+                u.setRole(role);
+                return;
+            }
+        }
+        throw new UtilisateurNotFoundException("Utilisateur avec l'ID " + id + " non trouvé");
+    }
+
+    public void supprimerUser(int id) throws UtilisateurNotFoundException {
+        boolean removed = utilisateurs.removeIf(u -> u.getId() == id);
+        if (!removed) {
+            throw new UtilisateurNotFoundException("Utilisateur avec l'ID " + id + " non trouvé");
+        }
+    }
+
+    public void chargerUtilisateursDepuisCSV() throws CSVOperationException {
+        try (BufferedReader br = new BufferedReader(new FileReader("utilisateurs.csv"))) {
+            String ligne;
+            while ((ligne = br.readLine()) != null) {
+                String[] details = ligne.split(",");
+                if (details.length == 4) {
+                    String nom = details[0];
+                    String prenom = details[1];
+                    String email = details[2];
+                    String role = details[3];
+                    ajouterUser(new Utilisateur(nom, prenom, email, role));
+                }
+            }
+        } catch (IOException e) {
+            // Ajout de la cause (IOException) dans l'exception CSVOperationException
+            throw new CSVOperationException("Erreur lors de la lecture du fichier CSV : " + e.getMessage(), e);
+        }
+    }
+
+    public void sauvegarderUtilisateursDansCSV() throws CSVOperationException {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("utilisateurs.csv"))) {
+            for (Utilisateur utilisateur : utilisateurs) {
+                bw.write(utilisateur.getNom() + "," +
+                         utilisateur.getPrenom() + "," +
+                         utilisateur.getEmail() + "," +
+                         utilisateur.getRole());
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            // Ajout de la cause (IOException) dans l'exception CSVOperationException
+            throw new CSVOperationException("Erreur lors de l'écriture dans le fichier CSV : " + e.getMessage(), e);
+        }
+    }
+
+    public Utilisateur getUtilisateurById(int utilisateurId) throws UtilisateurNotFoundException {
+        return utilisateurs.stream()
+            .filter(u -> u.getId() == utilisateurId)
+            .findFirst()
+            .orElseThrow(() -> new UtilisateurNotFoundException("Utilisateur avec l'ID " + utilisateurId + " non trouvé"));
+    }
+    
+    
+    
+    public String getRoleByEmail(String email) throws UtilisateurNotFoundException {
+        // Parcours de la liste des utilisateurs pour trouver celui qui correspond à l'email
+        for (Utilisateur utilisateur : utilisateurs) {
+            if (utilisateur.getEmail().equals(email)) {
+                return utilisateur.getRole(); // Retourner le rôle de l'utilisateur
+            }
+        }
+        // Si l'utilisateur avec cet email n'est pas trouvé, lancer une exception
+        throw new UtilisateurNotFoundException("Utilisateur avec l'email " + email + " non trouvé");
+    }
+   
+    
+    
+}

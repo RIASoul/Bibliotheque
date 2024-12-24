@@ -1,0 +1,123 @@
+package view;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import model.UtilisateurModel;
+import model.Utilisateur;
+
+public class Login extends JFrame {
+    private UtilisateurModel utilisateurModel = new UtilisateurModel();
+
+    public Login() {
+        setTitle("Gestion des Utilisateurs");
+        setSize(400, 300);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+
+        // Panel principal
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(2, 1, 10, 10));
+
+        // Boutons principaux
+        JButton btnInscription = new JButton("Inscription");
+        JButton btnConnexion = new JButton("Connexion");
+
+        panel.add(btnInscription);
+        panel.add(btnConnexion);
+
+        add(panel, BorderLayout.CENTER);
+
+        // Action pour le bouton Inscription
+        btnInscription.addActionListener(e -> afficherFormulaireInscription());
+
+        // Action pour le bouton Connexion (à implémenter selon votre logique)
+        btnConnexion.addActionListener(e -> JOptionPane.showMessageDialog(this, "Connexion en cours..."));
+    }
+
+    private void afficherFormulaireInscription() {
+        // Création du formulaire
+        JDialog dialog = new JDialog(this, "Inscription", true);
+        dialog.setSize(300, 400);
+        dialog.setLayout(new GridLayout(6, 2, 10, 10));
+
+        JLabel lblNom = new JLabel("Nom:");
+        JTextField txtNom = new JTextField();
+
+        JLabel lblPrenom = new JLabel("Prénom:");
+        JTextField txtPrenom = new JTextField();
+
+        JLabel lblEmail = new JLabel("Email:");
+        JTextField txtEmail = new JTextField();
+
+        JLabel lblRole = new JLabel("Rôle:");
+        JTextField txtRole = new JTextField();
+
+        JButton btnValider = new JButton("Valider");
+        JButton btnAnnuler = new JButton("Annuler");
+
+        dialog.add(lblNom);
+        dialog.add(txtNom);
+        dialog.add(lblPrenom);
+        dialog.add(txtPrenom);
+        dialog.add(lblEmail);
+        dialog.add(txtEmail);
+        dialog.add(lblRole);
+        dialog.add(txtRole);
+        dialog.add(btnValider);
+        dialog.add(btnAnnuler);
+
+        // Action pour le bouton Valider
+        btnValider.addActionListener(e -> {
+            String nom = txtNom.getText();
+            String prenom = txtPrenom.getText();
+            String email = txtEmail.getText();
+            String role = txtRole.getText();
+
+            if (nom.isEmpty() || prenom.isEmpty() || email.isEmpty() || role.isEmpty()) {
+                JOptionPane.showMessageDialog(dialog, "Veuillez remplir tous les champs.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (!email.contains("@")) {
+                JOptionPane.showMessageDialog(dialog, "Veuillez entrer un email valide.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Création de l'utilisateur
+            Utilisateur utilisateur = new Utilisateur(nom, prenom, email, role);
+            utilisateurModel.ajouterUser(utilisateur);
+
+            // Sauvegarde dans le fichier CSV
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter("utilisateurs.csv", true))) {
+                bw.write(utilisateur.getNom() + "," +
+                         utilisateur.getPrenom() + "," +
+                         utilisateur.getEmail() + "," +
+                         utilisateur.getRole());
+                bw.newLine();
+                JOptionPane.showMessageDialog(dialog, "Utilisateur enregistré avec succès !");
+                dialog.dispose();
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(dialog, "Erreur lors de l'enregistrement : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        // Action pour le bouton Annuler
+        btnAnnuler.addActionListener(e -> dialog.dispose());
+
+        dialog.setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            Login app = new Login();
+            app.setVisible(true);
+        });
+    }
+}
+

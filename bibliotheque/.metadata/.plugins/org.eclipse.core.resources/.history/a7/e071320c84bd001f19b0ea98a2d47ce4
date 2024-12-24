@@ -1,0 +1,17 @@
+package main;
+
+import view.MenuView;
+import javax.swing.SwingUtilities;
+
+public class Main {
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                // Create and display the MenuView
+                MenuView menuView = new MenuView();
+                menuView.setVisible(true);
+            }
+        });
+    }
+}

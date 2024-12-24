@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="view.LivreView"/>
+    <fullyQualifiedTypeName name="view.MenuView"/>
+    <fullyQualifiedTypeName name="model.Emprunt"/>
+    <fullyQualifiedTypeName name="model.Retour"/>
+    <fullyQualifiedTypeName name="controller.UtilisateurController"/>
+    <fullyQualifiedTypeName name="model.EmpruntModel"/>
+    <fullyQualifiedTypeName name="controller.EmpruntController"/>
+    <fullyQualifiedTypeName name="model.RetourModel"/>
+    <fullyQualifiedTypeName name="controller.RetourController"/>
+    <fullyQualifiedTypeName name="model.Livre"/>
+    <fullyQualifiedTypeName name="javax.swing.JTabbedPane"/>
+    <fullyQualifiedTypeName name="model.LivreModel"/>
+    <fullyQualifiedTypeName name="controller.LivreController"/>
+    <fullyQualifiedTypeName name="model.UtilisateurModel"/>
+    <fullyQualifiedTypeName name="model.Utilisateur"/>
+</qualifiedTypeNameHistroy>

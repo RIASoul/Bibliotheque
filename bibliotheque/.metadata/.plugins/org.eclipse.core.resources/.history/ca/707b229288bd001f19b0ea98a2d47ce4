@@ -1,0 +1,103 @@
+package controller;
+
+import model.Emprunt;
+import model.EmpruntModel;
+import model.Livre;
+import model.Utilisateur;
+import view.EmpruntView;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.time.LocalDate;
+import java.util.List;
+import javax.swing.JOptionPane;
+
+public class EmpruntController {
+
+    private EmpruntView view;
+    private EmpruntModel model;
+
+    public EmpruntController(EmpruntView view, EmpruntModel model) {
+        this.view = view;
+        this.model = model;
+
+        // Ajouter des listeners pour les boutons
+        this.view.addEnregistrerListener(new EnregistrerEmpruntListener());
+        this.view.addAfficherListener(new AfficherEmpruntListener());
+    }
+
+    // Listener pour le bouton "Enregistrer Emprunt"
+    private class EnregistrerEmpruntListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String utilisateur = view.getUtilisateur();
+            Object[] livres = view.getLivres(); // Livres sélectionnés
+            String dateEmpruntStr = view.getDateEmprunt();
+            String dateRetourStr = view.getDateRetour();
+
+            if (utilisateur == null || livres == null || livres.length == 0 || dateEmpruntStr.isEmpty() || dateRetourStr.isEmpty()) {
+                JOptionPane.showMessageDialog(view, "Tous les champs doivent être remplis.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            try {
+                LocalDate dateEmprunt = LocalDate.parse(dateEmpruntStr);
+                LocalDate dateRetour = LocalDate.parse(dateRetourStr);
+
+                // Récupérer l'utilisateur
+                Utilisateur utilisateurObj = model.getUtilisateurModel().getUtilisateurById(utilisateur);
+                
+                if (utilisateurObj != null) {
+                    // Récupérer les livres sélectionnés
+                    List<Livre> livresList = model.getLivreModel().getLivresByNames(livres);
+                    
+                    if (!livresList.isEmpty()) {
+                        // Créer l'emprunt
+                        Emprunt emprunt = new Emprunt(utilisateurObj, livresList, dateEmprunt, dateRetour);
+
+                        // Enregistrer l'emprunt
+                        model.enregistrerEmprunt(emprunt);
+                    } else {
+                        JOptionPane.showMessageDialog(view, "Livres introuvables.");
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(view, "Utilisateur introuvable.");
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(view, "Erreur dans les données saisies.", "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    // Listener pour le bouton "Afficher Emprunts"
+    private class AfficherEmpruntListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // Vider la table actuelle
+            //view.getTableModel().setRowCount(0);
+
+            // Ajouter tous les emprunts au modèle de la vue
+            for (Emprunt emprunt : model.getEmprunts()) {
+                String utilisateurId = String.valueOf(emprunt.getUtilisateur().getId());
+                String livreIds = getLivresIdsAsString(emprunt.getLivres());
+                String dateEmprunt = emprunt.getDateEmprunt().toString();
+                String dateRetour = emprunt.getDateRetourPrevue().toString();
+
+                // Ajouter à la table de la vue
+                view.ajouterEmprunt(utilisateurId, livreIds, dateEmprunt, dateRetour);
+            }
+        }
+
+        // Méthode pour obtenir les IDs des livres en tant que chaîne de caractères
+        private String getLivresIdsAsString(List<Livre> livres) {
+            StringBuilder livreIds = new StringBuilder();
+            for (Livre livre : livres) {
+                if (livreIds.length() > 0) {
+                    livreIds.append(", ");
+                }
+                livreIds.append(livre.getId());
+            }
+            return livreIds.toString();
+        }
+    }
+}

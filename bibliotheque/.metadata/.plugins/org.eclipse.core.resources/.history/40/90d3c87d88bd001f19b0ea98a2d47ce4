@@ -1,0 +1,108 @@
+package view;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.util.List;
+
+public class EmpruntView extends JPanel {
+
+    private JComboBox<String> utilisateurComboBox; // Liste déroulante des utilisateurs
+    private JComboBox<String> livresComboBox; // Liste déroulante des livres
+    private JTextField dateEmpruntField;
+    private JTextField dateRetourField;
+    private JButton enregistrerButton;
+    private JButton afficherButton;
+    private JButton consulterHistoriqueButton;
+    private JButton prolongerButton;
+
+    public EmpruntView() {
+        // Initialisation des composants de la vue
+        utilisateurComboBox = new JComboBox<>();
+        livresComboBox = new JComboBox<>();
+        dateEmpruntField = new JTextField(20);
+        dateRetourField = new JTextField(20);
+        enregistrerButton = new JButton("Enregistrer Emprunt");
+        afficherButton = new JButton("Afficher Emprunts");
+        consulterHistoriqueButton = new JButton("Consulter Historique");
+        prolongerButton = new JButton("Prolonger Emprunt");
+
+        // Ajout des composants à la fenêtre
+        setLayout(new GridLayout(6, 2)); // Utilisation d'un GridLayout pour une meilleure organisation
+
+        add(new JLabel("Sélectionner Utilisateur"));
+        add(utilisateurComboBox);
+        add(new JLabel("Sélectionner Livre"));
+        add(livresComboBox);
+        add(new JLabel("Date Emprunt (YYYY-MM-DD)"));
+        add(dateEmpruntField);
+        add(new JLabel("Date Retour (YYYY-MM-DD)"));
+        add(dateRetourField);
+        add(enregistrerButton);
+        add(afficherButton);
+        add(consulterHistoriqueButton);
+        add(prolongerButton);
+
+        setSize(300, 500);
+        setVisible(true);
+    }
+
+    // Méthode pour récupérer l'utilisateur sélectionné
+    public String getUtilisateur() {
+        return (String) utilisateurComboBox.getSelectedItem();
+    }
+
+    // Méthode pour récupérer les livres sélectionnés
+    public Object[] getLivres() {
+        return livresComboBox.getSelectedObjects(); // Peut être modifié pour permettre de sélectionner plusieurs livres
+    }
+
+    // Méthode pour récupérer la date d'emprunt
+    public String getDateEmprunt() {
+        return dateEmpruntField.getText();
+    }
+
+    // Méthode pour récupérer la date de retour
+    public String getDateRetour() {
+        return dateRetourField.getText();
+    }
+
+    // Méthode pour remplir la liste déroulante des utilisateurs
+    public void remplirUtilisateurs(List<String> utilisateurs) {
+        for (String utilisateur : utilisateurs) {
+            utilisateurComboBox.addItem(utilisateur);
+        }
+    }
+
+    // Méthode pour remplir la liste déroulante des livres
+    public void remplirLivres(List<String> livres) {
+        for (String livre : livres) {
+            livresComboBox.addItem(livre);
+        }
+    }
+
+    // Méthode pour ajouter le listener au bouton "Enregistrer Emprunt"
+    public void addEnregistrerListener(ActionListener listener) {
+        enregistrerButton.addActionListener(listener);
+    }
+
+    // Méthode pour ajouter le listener au bouton "Afficher Emprunts"
+    public void addAfficherListener(ActionListener listener) {
+        afficherButton.addActionListener(listener);
+    }
+
+    // Méthode pour ajouter le listener au bouton "Consulter Historique"
+    public void addConsulterHistoriqueListener(ActionListener listener) {
+        consulterHistoriqueButton.addActionListener(listener);
+    }
+
+    // Méthode pour ajouter le listener au bouton "Prolonger Emprunt"
+    public void addProlongerListener(ActionListener listener) {
+        prolongerButton.addActionListener(listener);
+    }
+
+    // Méthode pour afficher un emprunt dans la vue (table)
+    public void ajouterEmprunt(String utilisateur, String livre, String dateEmprunt, String dateRetour) {
+        System.out.println("Emprunt ajouté : " + utilisateur + ", " + livre + ", " + dateEmprunt + ", " + dateRetour);
+    }
+}
